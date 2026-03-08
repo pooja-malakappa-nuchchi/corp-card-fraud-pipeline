@@ -4,6 +4,29 @@ from sklearn.preprocessing import StandardScaler
 
 def transform_data(df):
     print("Starting transformation...")
+
+    #  # STEP 1 — SAFETY CLEANING (Not needed as data is clean already, no null values, no datatype changes needed)
+    
+    # # Remove duplicates
+    # before = len(df)
+    # df = df.drop_duplicates()
+    # after = len(df)
+    # print(f"✅ Duplicates removed: {before - after} rows dropped")
+    
+    # # Handle missing values
+    # missing = df.isnull().sum().sum()
+    # if missing > 0:
+    #     print(f"⚠️ Found {missing} missing values — filling...")
+    #     num_cols = df.select_dtypes(include=[np.number]).columns
+    #     df[num_cols] = df[num_cols].fillna(df[num_cols].median())
+    #     print("✅ Missing values filled with median")
+    # else:
+    #     print("✅ No missing values found!")
+
+    # # Fix data types
+    # df['Class'] = df['Class'].astype(int)
+    # print("✅ Data types verified")
+    #==================================================
     
     # Step 1 — Engineer Hour feature
     df['Hour'] = (df['Time'] / 3600) % 24

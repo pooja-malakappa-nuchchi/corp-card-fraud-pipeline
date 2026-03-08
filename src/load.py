@@ -47,3 +47,9 @@ if __name__ == '__main__':
 
 
     #python src/load.py
+    #to check:
+    # psql -U postgres -d corp_card_fraud
+    # SELECT COUNT(*) FROM raw_transactions;
+    # SELECT COUNT(*) FROM processed_transactions;
+    # SELECT column_name FROM information_schema.columns  WHERE table_name = 'raw_transactions';
+    # SELECT column_name FROM information_schema.columns  WHERE table_name = 'processed_transactions';
