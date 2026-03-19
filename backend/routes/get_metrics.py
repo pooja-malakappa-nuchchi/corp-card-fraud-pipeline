@@ -3,6 +3,8 @@ from fastapi import APIRouter
 router = APIRouter()
 
 @router.get("/metrics")
+#GET endpoint at /metrics Returns all 5 model metrics
+
 def get_metrics():
     return {
         "models": [
@@ -15,6 +17,10 @@ def get_metrics():
         "best_model": "Random Forest",
         "best_auc_roc": 0.9845
     }
+# Returns a dictionary with:
+# 1. List of all 5 models with their metrics
+# 2. Best model name
+# 3. Best AUC-ROC score
 
 @router.get("/metrics/confusion-matrix")
 def get_confusion_matrix():
@@ -27,3 +33,10 @@ def get_confusion_matrix():
             {"name": "LightGBM", "tn": 56096, "fp": 768, "fn": 9, "tp": 89}
         ]
     }
+
+#-----------------------------------------------------------------------------------------------------------------
+# /metrics → needed immediately on page load
+#            shows comparison table + AUC chart
+
+# /metrics/confusion-matrix → needed only when
+#            user expands individual model card

@@ -1,6 +1,9 @@
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
+import joblib
+import os
+import json
 
 def transform_data(df):
     print("Starting transformation...")
@@ -41,6 +44,28 @@ def transform_data(df):
     # 2. Calculates std 
     # 3. Applies (value - mean) / std to every row
     print(" Amount scaled")
+
+    # Save scaler so predict_transaction.py can use same scaling
+    # When new dataset comes in, scaler updates automatically i.e., New dataset has different transactions Different amounts, different patterns
+    # So, based on input, New mean and std will be calculated
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    scaler_path = os.path.join(base_dir, 'models', 'scaler.pkl')
+    joblib.dump(scaler, scaler_path)
+    print("Scaler saved to models/scaler.pkl")
+
+    # Save V1-V28 medians
+    # When new dataset comes → medians recalculate automatically!
+    v_cols = [f'V{i}' for i in range(1, 29)]
+    v_medians = df[v_cols].median().tolist()
+    medians_path = os.path.join(base_dir, 'models', 'v_medians.json')
+    with open(medians_path, 'w') as f:
+        json.dump(v_medians, f)
+    print("V medians saved to models/v_medians.json")
+
+# New data arrives
+# transform.py runs on NEW data
+# scaler.fit_transform(df[['Amount']]) --> (fits on NEW data, calculates NEW mean and std, saves NEW scaler.pkl)        ↓
+# predict_transaction.py loads NEW scaler.pkl uses NEW mean and std automatically 
     
     # Step 3 — Drop original Time and Amount columns
     # (replaced by Hour and Amount_Scaled)
