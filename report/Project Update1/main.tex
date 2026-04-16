@@ -1,0 +1,45 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[numbers]{natbib}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
+
+\title{Corporate Credit Card Misuse Detection Using Machine Learning and ETL Pipeline \\ \large Project Update 1 --- Literature Review}
+\author{Pooja Malakappa Nuchchi}
+\date{April 2026}
+
+\begin{document}
+\maketitle
+
+\section{Introduction and Problem Statement}
+
+Corporate credit card misuse is a significant financial and compliance challenge. Employees issued corporate cards for legitimate business expenses may use them for unauthorized personal purchases, resulting in financial losses and policy violations. Manual review of thousands of transactions is time-consuming and not scalable.
+
+Formally, the learning problem is defined as: given a transaction record $x \in \mathbb{R}^{30}$ consisting of 28 anonymized behavioral features $V_1, \ldots, V_{28}$, a normalized transaction amount, and hour of day, predict a binary label $y \in \{0, 1\}$ where $y = 1$ indicates misuse and $y = 0$ indicates legitimate spending. The dataset used is the Credit Card Fraud Detection dataset (ULB, Kaggle) containing 284,807 transactions with 99.83\% legitimate vs 0.17\% fraudulent --- a severely imbalanced classification problem.
+
+\section{Motivation}
+
+Financial fraud detection is one of the most practically important applications of machine learning. Organizations lose significant revenue to fraud annually, with corporate card misuse among the most common types. Automated detection systems reduce investigation time and improve accuracy compared to rule-based systems. Multiple studies have shown that models like Random Forest and Logistic Regression can effectively detect fraudulent transactions \cite{wang2023credit, hande2019credit}. The core challenge is severe class imbalance, which requires techniques like SMOTE oversampling and data augmentation \cite{khalid2024enhancing, strelcenia2023improving}.
+
+\section{Related Work}
+
+\textbf{Logistic Regression} is a common baseline for fraud classification because it is simple and interpretable. Wang and team compared Logistic Regression and Random Forest on simulated transaction data and found Random Forest performs better \cite{wang2023credit}. Sopiyan and team also compared Logistic Regression with Random Forest and Gradient Boosting using SMOTE and found ensemble methods work better than the logistic baseline \cite{sopiyan2022fraud}.
+
+\textbf{Support Vector Machines} have been used in fraud detection for finding decision boundaries in high-dimensional spaces. Xia and team applied SVM with GridSearchCV tuning to the Kaggle credit card dataset, optimizing AUC and F1-score \cite{xia2022credit}. Aftab and team used SVM alongside Random Forest and Logistic Regression and found ensemble methods work better than single classifiers \cite{aftab2023fraud}.
+
+\textbf{Random Forest} is one of the most effective models for fraud detection because its ensemble voting mechanism naturally handles class imbalance. Hande and team compared Logistic Regression, Decision Tree, and Random Forest and found Random Forest performs best \cite{hande2019credit}. Aburbeian and team combined Random Forest with SMOTE and got strong results on imbalanced credit card data \cite{aburbeian2023credit}.
+
+\textbf{Gradient Boosting} methods are the current state of the art for tabular fraud detection. XGBoost builds trees one after another, where each tree corrects the mistakes of the previous one. LightGBM uses leaf-wise tree growth, which makes it faster on large datasets. Sopiyan and team found Gradient Boosting competitive with Random Forest on credit card fraud data \cite{sopiyan2022fraud}.
+
+\textbf{Class Imbalance Handling:} SMOTE creates synthetic minority class samples by interpolating between existing ones and is the most common approach for imbalanced data. Khalid and team tested ensemble methods with both under-sampling and SMOTE on European credit card transactions and showed that resampling improves minority class detection \cite{khalid2024enhancing}. Tran and team compared SMOTE and ADASYN for balancing credit card fraud data before training Random Forest and Logistic Regression \cite{tran2021machine}. Strelcenia and team proposed a new augmentation method called K-CGAN as an alternative to SMOTE \cite{strelcenia2023improving}.
+
+\textbf{Production ML Pipelines:} Most of the above studies focus only on model accuracy without considering deployment. ETL pipelines that separate ingestion, transformation, and loading ensure reproducibility and scalability. This project adopts that principle using PostgreSQL and Apache Airflow.
+
+\section{How This Approach Differs}
+
+Most prior work focuses only on model performance in isolation. This project combines a complete data engineering layer (ETL pipeline, PostgreSQL, Apache Airflow) with a five-model comparison (Logistic Regression, LinearSVC, Random Forest, XGBoost, LightGBM), a REST API backend (FastAPI), and an interactive React dashboard. This end-to-end production-style system addresses real-world deployment considerations that are typically missing from academic fraud detection papers.
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}

@@ -1,0 +1,323 @@
+% ---------------------------------------------------------------
+% ICML 2026 format — Project Update 2: Data & Formal Definitions
+%
+% HOW TO COMPILE IN OVERLEAF:
+%   1. Open the ICML 2025 Overleaf template and copy icml2025.sty:
+%      https://www.overleaf.com/latex/templates/icml2025-template/dhxrkcgkvnkt
+%      Rename it icml2026.sty and upload to your Overleaf project.
+%   2. Upload icml2026.sty + this .tex + your references.bib
+%   3. Compile with pdflatex
+% ---------------------------------------------------------------
+\documentclass{article}
+\usepackage[accepted]{icml2025} 
+\usepackage[numbers]{natbib}
+
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
+\usepackage{tikz}
+\usepackage{float}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, backgrounds, fit}
+
+% ---------------------------------------------------------------
+\icmltitlerunning{Corporate Credit Card Misuse Detection}
+
+\begin{document}
+
+\twocolumn[
+\icmltitle{Corporate Credit Card Misuse Detection Using\\
+           Machine Learning and ETL Pipeline\\[4pt]
+           {\normalsize\rm Project Update 2 --- Data \& Formal Definitions}}
+
+\begin{icmlauthorlist}
+\icmlauthor{Pooja Malakappa Nuchchi}{neu}
+\end{icmlauthorlist}
+
+\icmlaffiliation{neu}{Khoury College of Computer Sciences, Northeastern University (Roux Institute), Portland, ME, USA}
+
+\icmlcorrespondingauthor{Pooja Malakappa Nuchchi}{nuchchi.p@northeastern.edu}
+
+\icmlkeywords{fraud detection, machine learning, ETL pipeline, class imbalance, SMOTE}
+
+\vskip 0.3in
+]
+
+\printAffiliationsAndNotice{}
+
+% ---------------------------------------------------------------
+\begin{abstract}
+Corporate credit card misuse is a significant financial and compliance
+challenge in enterprise settings. This paper presents an end-to-end
+machine learning system for detecting fraudulent corporate card
+transactions, combining a full ETL pipeline (PostgreSQL, Apache Airflow)
+with a five-model comparison (Logistic Regression, LinearSVC, Random
+Forest, XGBoost, LightGBM). We use the ULB Credit Card Fraud Detection
+dataset (284,807 transactions, 0.17\% fraud) and address severe class
+imbalance using SMOTE. Results are served through a FastAPI backend and
+React dashboard for production-style deployment.
+\end{abstract}
+
+% ---------------------------------------------------------------
+\section{Introduction and Problem Statement}
+
+Corporate credit card misuse is a significant financial and compliance
+challenge. Employees issued corporate cards for legitimate business
+expenses may use them for unauthorized personal purchases, resulting in
+financial losses and policy violations. Manual review of thousands of
+transactions is time-consuming and not scalable.
+
+Formally, the learning problem is defined as: given a transaction record
+$x \in \mathbb{R}^{30}$ consisting of 28 anonymized behavioral features
+$V_1, \ldots, V_{28}$, a normalized transaction amount, and hour of day,
+predict a binary label $y \in \{0, 1\}$ where $y = 1$ indicates misuse
+and $y = 0$ indicates legitimate spending. The dataset used is the Credit
+Card Fraud Detection dataset (ULB, Kaggle) containing 284,807 transactions
+with 99.83\% legitimate vs.\ 0.17\% fraudulent --- a severely imbalanced
+classification problem.
+
+% ---------------------------------------------------------------
+\section{Motivation}
+
+Financial fraud detection is one of the most practically important
+applications of machine learning. Organizations lose significant revenue
+to fraud annually, with corporate card misuse among the most common types.
+Automated detection systems reduce investigation time and improve accuracy
+compared to rule-based systems. Multiple studies have shown that models
+like Random Forest and Logistic Regression can effectively detect
+fraudulent transactions~\cite{wang2023credit,hande2019credit}. The core
+challenge is severe class imbalance, which requires techniques like SMOTE
+oversampling and data augmentation~\cite{khalid2024enhancing,strelcenia2023improving}.
+
+% ---------------------------------------------------------------
+\section{Related Work}
+
+\textbf{Logistic Regression} is a common baseline for fraud
+classification because it is simple and interpretable. Wang et al.\
+compared Logistic Regression and Random Forest on simulated transaction
+data and found Random Forest performs better~\cite{wang2023credit}.
+Sopiyan et al.\ also compared Logistic Regression with Random Forest and
+Gradient Boosting using SMOTE and found ensemble methods outperform the
+logistic baseline~\cite{sopiyan2022fraud}.
+
+\textbf{Support Vector Machines} have been used in fraud detection for
+finding decision boundaries in high-dimensional spaces. Xia et al.\
+applied SVM with GridSearchCV tuning to the Kaggle credit card dataset,
+optimizing AUC and F1-score~\cite{xia2022credit}. Aftab et al.\ used SVM
+alongside Random Forest and Logistic Regression and found ensemble methods
+outperform single classifiers~\cite{aftab2023fraud}.
+
+\textbf{Random Forest} is one of the most effective models for fraud
+detection because its ensemble voting mechanism naturally handles class
+imbalance. Hande et al.\ compared Logistic Regression, Decision Tree, and
+Random Forest and found Random Forest performs best~\cite{hande2019credit}.
+Aburbeian and Ashqar combined Random Forest with SMOTE and achieved strong
+results on imbalanced credit card data~\cite{aburbeian2023credit}.
+
+\textbf{Gradient Boosting} methods are the current state of the art for
+tabular fraud detection. XGBoost builds trees sequentially, each
+correcting the residual errors of the previous. LightGBM uses leaf-wise
+tree growth, which makes it faster on large datasets. Sopiyan et al.\
+found Gradient Boosting competitive with Random Forest on credit card
+fraud data~\cite{sopiyan2022fraud}.
+
+\textbf{Class Imbalance Handling:} SMOTE creates synthetic minority class
+samples by interpolating between existing ones. Khalid et al.\ tested
+ensemble methods with SMOTE on European credit card transactions and showed
+that resampling improves minority class detection~\cite{khalid2024enhancing}.
+Tran and Dang compared SMOTE and ADASYN for balancing credit card fraud
+data before training Random Forest and Logistic
+Regression~\cite{tran2021machine}. Strelcenia and Prakoonwit proposed
+K-CGAN as an alternative to SMOTE~\cite{strelcenia2023improving}.
+
+\textbf{Production ML Pipelines:} Most prior studies focus only on model
+accuracy without considering deployment. ETL pipelines that separate
+ingestion, transformation, and loading ensure reproducibility and
+scalability. This project adopts that principle using PostgreSQL and
+Apache Airflow.
+
+% ---------------------------------------------------------------
+\section{How This Approach Differs}
+
+Most prior work focuses only on model performance in isolation. This
+project combines a complete data engineering layer (ETL pipeline,
+PostgreSQL, Apache Airflow) with a five-model comparison (Logistic
+Regression, LinearSVC, Random Forest, XGBoost, LightGBM), a REST API
+backend (FastAPI), and an interactive React dashboard. This end-to-end
+production-style system addresses real-world deployment considerations
+that are typically missing from academic fraud detection papers.
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\columnwidth]{architecture.png}
+\caption{End-to-end system architecture. Raw transaction data flows
+through the ETL pipeline orchestrated by Airflow, is balanced with
+SMOTE, then passed to five ML models. Random Forest ($\star$,
+AUC-ROC~0.9845) is served via FastAPI and visualized in a React
+dashboard.}
+\label{fig:arch}
+\end{figure}
+
+\caption{End-to-end system architecture. Raw transaction data flows
+  through the ETL pipeline orchestrated by Airflow, is balanced with
+  SMOTE, then passed to five ML models. Random Forest ($\star$,
+  AUC-ROC~0.9845) is served via FastAPI and visualized in a React
+  dashboard.}
+\label{fig:arch}
+\end{figure}
+
+% ---------------------------------------------------------------
+\section{Dataset}
+
+\subsection{Input and Output}
+
+The input is a transaction record $x \in \mathbb{R}^{30}$ with three
+types of features: (1) 28 PCA-transformed anonymized features
+$V_1, \ldots, V_{28}$ representing behavioral patterns,
+(2)~\texttt{Amount\_Scaled}, the transaction amount standardized using
+z-score normalization:
+\[
+  z = \frac{x - \mu}{\sigma}
+\]
+and (3)~\texttt{Hour}, the hour of day extracted from the raw
+\texttt{Time} field as:
+\[
+  \text{Hour} = \left\lfloor \frac{\texttt{Time}}{3600} \bmod 24
+  \right\rfloor
+\]
+The output is a binary label $y \in \{0, 1\}$ where $y = 1$ indicates
+fraud.
+
+\subsection{Distribution, Size, and Missingness}
+
+The dataset contains 284,807 transactions. The class distribution is
+severely imbalanced: 284,315 legitimate (99.83\%) and 492 fraudulent
+(0.17\%). There are no missing values in any column. Most transaction
+amounts are small (under \$500 for both classes), but legitimate
+transactions have outliers up to \$25,691 while fraud transactions never
+exceed \$2,125 (Figure~\ref{fig:amount}). Fraudulent transactions are
+more evenly spread across hours, with 2AM having the highest fraud rate
+at 1.713\% (Figure~\ref{fig:hour}).
+
+\subsection{Preprocessing}
+
+The preprocessing pipeline (\texttt{src/transform.py}) performs three
+steps: (1) engineer the \texttt{Hour} feature from the raw \texttt{Time}
+column, (2) scale the \texttt{Amount} column using \texttt{StandardScaler}
+and save the scaler artifact to \texttt{models/scaler.pkl} for consistent
+inference, and (3) drop the original \texttt{Time} and \texttt{Amount}
+columns. Median values of $V_1$--$V_{28}$ are saved to
+\texttt{models/v\_medians.json} for use during single-transaction
+prediction.
+
+\subsection{Exploratory Data Analysis}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\columnwidth]{amount_boxplot.png}
+\caption{Transaction amount by class. Legitimate transactions have
+outliers up to \$25,691; fraud stays below \$2,125.}
+\label{fig:amount}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\columnwidth]{fraud_percentage_by_hour.png}
+\caption{Fraud percentage by hour of day. 2AM has the highest fraud
+rate at 1.713\%.}
+\label{fig:hour}
+\end{figure}
+
+% ---------------------------------------------------------------
+\section{Methodology}
+
+\subsection{Evaluation Metrics}
+
+Since the dataset is severely imbalanced, accuracy alone is misleading
+--- a model predicting all transactions as legitimate achieves 99.83\%
+accuracy. Instead, the following metrics are used:
+
+\textbf{Precision} measures how many flagged transactions are actually
+fraud:
+\[
+  \text{Precision} = \frac{TP}{TP + FP}
+\]
+
+\textbf{Recall} measures how many actual fraud cases the model catches:
+\[
+  \text{Recall} = \frac{TP}{TP + FN}
+\]
+
+\textbf{F1-Score} balances precision and recall:
+\[
+  F_1 = 2 \cdot \frac{\text{Precision} \cdot \text{Recall}}
+                     {\text{Precision} + \text{Recall}}
+\]
+
+\textbf{AUC-ROC} measures the model's ability to distinguish between
+classes across all thresholds (0.5 = random, 1.0 = perfect).
+
+\subsection{Models}
+
+\textbf{Baseline --- Logistic Regression:} A linear model that estimates
+fraud probability using the sigmoid function:
+\[
+  P(y=1 \mid x) = \frac{1}{1 + e^{-(\beta_0 + \beta^T x)}}
+\]
+
+\textbf{LinearSVC:} A linear support vector classifier that finds the
+maximum-margin hyperplane by minimizing:
+\[
+  \frac{1}{2}\|w\|^2 + C \sum_{i}
+  \max\!\left(0,\ 1 - y_i(w^T x_i + b)\right)
+\]
+
+\textbf{Random Forest:} An ensemble of decision trees trained on
+bootstrap samples. The final prediction is the majority vote across all
+trees, which reduces overfitting and handles class imbalance.
+
+\textbf{XGBoost:} A gradient boosting method that builds trees
+sequentially, each correcting the residual errors of the previous trees
+using a regularized objective function.
+
+\textbf{LightGBM:} A gradient boosting method using leaf-wise tree
+growth instead of level-wise, making it faster on large datasets.
+
+\subsection{Training and Validation}
+
+The data is split 80/20 into training (227,845 samples) and test
+(56,962 samples). SMOTE is applied only to the training set, balancing
+both classes to 227,451 samples each. The test set remains untouched to
+simulate real-world conditions. All five models are trained on the
+balanced training data and evaluated on the original imbalanced test set.
+
+\begin{table}[h]
+\centering
+\caption{Model comparison on the test set.}
+\label{tab:results}
+\vskip 0.1in
+\begin{small}
+\begin{tabular}{lcccc}
+\toprule
+Model & Prec. & Recall & F1 & AUC \\
+\midrule
+Logistic Reg.  & 0.05 & 0.92 & 0.10 & 0.9715 \\
+LinearSVC      & 0.05 & 0.92 & 0.10 & 0.9742 \\
+Random Forest  & \textbf{0.86} & 0.83 & \textbf{0.84} & \textbf{0.9845} \\
+XGBoost        & 0.54 & 0.87 & 0.66 & 0.9739 \\
+LightGBM       & 0.10 & 0.91 & 0.19 & 0.9802 \\
+\bottomrule
+\end{tabular}
+\end{small}
+\end{table}
+
+Random Forest achieves the best overall performance with the highest
+precision (0.86), F1-score (0.84), and AUC-ROC (0.9845).
+
+% ---------------------------------------------------------------
+\bibliography{references}
+\bibliographystyle{plainnat}
+
+\end{document}
