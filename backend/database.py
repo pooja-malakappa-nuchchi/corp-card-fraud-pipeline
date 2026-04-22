@@ -24,3 +24,4 @@ def get_db():
 # engine: Opens connection to database
 # SessionLocal: Creates database sessions
 # get_db(): Gives a session and closes it after use
+#https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud (dataset source)
